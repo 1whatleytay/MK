@@ -3,6 +3,8 @@
 
 #include "Util.h"
 
+#include <stack>
+
 class Parser {
     int rollbackIndex = 0;
     int index = 0;
@@ -14,6 +16,20 @@ class Parser {
     void pushIndex();
 
 public:
+    enum Mode {
+        Generic,
+        Structure,
+        Original,
+    };
+
+    void pushMode(Mode mode);
+    Mode popMode();
+private:
+    std::stack<Mode> modes;
+    Mode currentMode = Generic;
+
+public:
+
     bool reachedEnd(int offset = 0);
 
     void seekNext(const std::string &word);
@@ -30,11 +46,15 @@ public:
     std::string untilNextWords(const std::vector<std::string> &tests);
     std::string untilNextWhitespace();
 
-    char lastSymbol();
+    std::string toString();
+
+    char lastSymbol() ;
     std::string lastWord();
 
     char nextSymbol();
     std::string nextWord();
+
+    static std::string trim(std::string text);
 
     explicit Parser(std::string nText);
 };

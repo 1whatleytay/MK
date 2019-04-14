@@ -17,6 +17,7 @@ public:
         Execute,
         ModifyTarget,
         Method,
+        Player,
     };
 
     Node *parent;

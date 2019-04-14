@@ -1,3 +1,5 @@
+#include <utility>
+
 #include <Parser.h>
 
 #include <sstream>
@@ -28,6 +30,7 @@ const char symbols[] = {
         '?',
         '<',
         '>',
+        '~',
 };
 
 bool isStrongChar(char ch) {
@@ -36,6 +39,18 @@ bool isStrongChar(char ch) {
         if (c == ch) return true;
     }
     return false;
+}
+
+void Parser::pushMode(Parser::Mode mode) {
+    modes.push(currentMode);
+    currentMode = mode;
+}
+
+Parser::Mode Parser::popMode() {
+    Mode lastMode = currentMode;
+    currentMode = modes.top();
+    modes.pop();
+    return lastMode;
 }
 
 bool Parser::end(int offset) {
@@ -48,7 +63,7 @@ bool Parser::reachedEnd(int offset) {
 }
 
 void Parser::pushIndex() {
-    while (!end() && std::isspace(text[index])) { index++; }
+    if (currentMode != Original) while (!end() && std::isspace(text[index])) { index++; }
 }
 
 void Parser::seekNext(const std::string &word) {
@@ -83,8 +98,6 @@ std::string Parser::untilNextSymbolClosing(char opening, char symbol, int depth)
 
     int length = 0;
     while (!reachedEnd(length)) {
-        char x = text[index + length];
-
         if (text[index + length] == symbol) {
             depth--;
             if (depth <= 0) break;
@@ -117,7 +130,7 @@ std::string Parser::lastWord() {
     int temp = index;
 
     while (index > 0 && std::isspace(text[index])) { index--; }
-    while (index > 0 && !isStrongChar(text[index])) { index--; }
+    if (currentMode != Original) while (index > 0 && !isStrongChar(text[index])) { index--; }
 
     std::string word = nextWord();
     rollback();
@@ -133,8 +146,7 @@ std::string Parser::untilNextSymbol(char symbol) {
 
     int length = 0;
     while (!reachedEnd(length) && (text[index + length] != symbol)) { length++; }
-    while (length >= 0 && std::isspace(text[index + length - 1])) { length--; }
-    length = std::max(length, 0);
+    if (currentMode != Original) while (length > 0 && std::isspace(text[index + length - 1])) { length--; }
 
     std::string result = reachedEnd() ? "" : text.substr((unsigned long)index, (unsigned long)length);
     index += length;
@@ -150,7 +162,9 @@ std::string Parser::untilNextSymbols(const std::vector<char> &tests) {
     while (!reachedEnd(length) && (std::find(tests.begin(), tests.end(), text[index + length]) == tests.end())) {
         length++;
     }
-    while (length >= 0 && std::isspace(text[index + length - 1])) { length--; }
+    while (length >= 0 && std::isspace(text[index + length - 1])) {
+        length--;
+    }
     length = std::max(length, 0);
 
     std::string result = reachedEnd() ? "" : text.substr((unsigned long)index, (unsigned long)length);
@@ -195,6 +209,8 @@ std::string Parser::untilNextWhitespace() {
     return result;
 }
 
+std::string Parser::toString() { return text; }
+
 char Parser::nextSymbol() {
     rollbackIndex = index;
     pushIndex();
@@ -218,6 +234,11 @@ std::string Parser::nextWord() {
     index += length;
 
     return result;
+}
+
+std::string Parser::trim(std::string text) {
+    Parser parser = Parser(std::move(text));
+    return parser.untilNextSymbol('\0');
 }
 
 Parser::Parser(std::string nText) : text(move(nText)) { }

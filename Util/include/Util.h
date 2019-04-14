@@ -48,6 +48,14 @@ public:
     WrongCase(std::string expectedCase, std::string name);
 };
 
+class InvalidParam : public Exception {
+    std::string type;
+    std::string name;
+public:
+    std::string info() const override;
+    InvalidParam(std::string type, std::string name);
+};
+
 class UnexpectedLine : public Exception {
     std::string line;
 public:

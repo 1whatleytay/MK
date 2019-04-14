@@ -3,16 +3,19 @@
 
 #include <Node.h>
 
+#include <unordered_map>
+
 class Parser;
+class MethodInfo;
 
 class MethodNode : public Node {
 public:
-    std::string methodName;
-    std::string methodValue;
-
-    static bool isMethod(const std::string &name);
+    const MethodInfo *method = nullptr;
+    std::unordered_map<std::string, std::string> methodValues;
 
     std::string getSource() override;
+
+    static bool hasMethod(const std::string &name);
 
     MethodNode(Node *parent, Parser &parser);
 };

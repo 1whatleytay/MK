@@ -62,7 +62,13 @@ The following methods currently exist:
 
 Method Name | Method Function
 ----------- | ---------------
-say(text) | Says `text` in chat. No quotes.
+help(command?) | Gives help information for a command.
+say(text) | Says `text` in chat.
+weather(type) | Sets the current weather.
+clone(regionStart, regionEnd, to, mask?, type?, block?) | Clones a region of blocks.
+difficulty(level), | Sets the difficulty level to `level`.
+summon(entity, coord?, data?) | Summons an entity.
+
 
 ### Targets
 A target can be a player name or a group (in the future, they can also be a type of entity).
@@ -84,6 +90,8 @@ Method Name | Method Function
 ----------- | ---------------
 kill() | Kills the target.
 give(item, count, data?) | Gives the target `count` `item`s with NBT data `data` if it exists.
+playSound(sound, source, coord?, volume?, pitch?, minVolume?) | Plays a sound for a player.
+gamemode(mode) | Changes the gamemode for a player.
 
 ### Scores
 A score can be declared in our out of a function with the `score` keyword.

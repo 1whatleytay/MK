@@ -5,6 +5,8 @@
 
 #include <unordered_map>
 
+class Parser;
+
 class JSON {
 public:
     enum Type {
@@ -41,6 +43,8 @@ public:
     explicit JSON(std::string value);
     explicit JSON(bool value);
     explicit JSON(Type type);
+
+    static JSON *create(Parser &parser);
 
     ~JSON();
 };

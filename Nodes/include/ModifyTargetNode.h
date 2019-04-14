@@ -3,20 +3,19 @@
 
 #include <Node.h>
 
+#include <unordered_map>
+
 class Parser;
+class MethodInfo;
 
 class ModifyTargetNode : public Node {
 public:
-    enum Function {
-        Kill,
-        Give,
-    };
-
-    std::string modifyTarget, modifyValue, modifyData;
-    int modifyCount = 0;
-    Function modifyFunction;
+    const MethodInfo *method = nullptr;
+    std::unordered_map<std::string, std::string> methodValues;
 
     std::string getSource() override;
+
+    static bool hasMethod(const std::string &name);
 
     ModifyTargetNode(Node *parent, Parser &parser);
 };

@@ -54,7 +54,7 @@ ModifyScoreNode::ModifyScoreNode(Node *parent, Parser &parser) : Node(parent, Mo
         case Add:
         case Sub:
             modifyTarget = parseTarget(params.nextText());
-            modifyValue = params.nextNumber();
+            modifyValue = std::stoi(params.nextNumber());
             break;
 
         case SetDisplay:

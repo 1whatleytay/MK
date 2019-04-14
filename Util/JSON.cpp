@@ -1,5 +1,8 @@
 #include "JSON.h"
 
+#include <Parser.h>
+#include <Formats.h>
+
 #include <sstream>
 
 std::string JSON::make() const {
@@ -85,6 +88,34 @@ JSON::JSON(double value) : type(Number), number(value) { }
 JSON::JSON(std::string value) : type(Text), text(std::move(value)) { }
 JSON::JSON(bool value) : type(Boolean), state(value) { }
 JSON::JSON(JSON::Type type) : type(type) { }
+
+JSON* JSON::create(Parser &parser) {
+    char firstSym = parser.nextSymbol();
+    parser.rollback();
+
+    if (std::isdigit(firstSym)) return new JSON(std::stod(parser.toString()));
+    if (firstSym == '\"') return new JSON(parseQuotes(parser.toString()));
+    if (firstSym == '{') {
+        JSON *result = new JSON(JSON::Object);
+        if (parser.nextSymbol() != '{') throw UnexpectedSymbol({ '{' }, parser.lastSymbol());
+        std::string text = parser.untilNextSymbolClosing('{', '}', 1);
+
+        // TODO: Fill in.
+
+        if (parser.nextSymbol() != '}') throw UnexpectedSymbol({ '}' }, parser.lastSymbol());
+
+        return result;
+    }
+    if (firstSym == '[') {
+        JSON *result = new JSON(JSON::Array);
+
+        // TODO: Fill in.
+
+        return result;
+    }
+
+    return nullptr;
+}
 
 JSON::~JSON() {
     switch (type) {

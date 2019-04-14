@@ -42,6 +42,9 @@ std::string WrongCase::info() const { return "\"" + name + "\" is not in " + exp
 WrongCase::WrongCase(std::string expectedCase, std::string name)
     : expectedCase(std::move(expectedCase)), name(std::move(name)) { }
 
+std::string InvalidParam::info() const { return "\"" + name + "\" is not a valid " + type + "."; }
+InvalidParam::InvalidParam(std::string type, std::string name) : type(std::move(type)), name(std::move(name)) { }
+
 std::string UnexpectedLine::info() const { return "Unexpected line \"" + line + "\"."; }
 UnexpectedLine::UnexpectedLine(std::string line) : line(std::move(line)) { }
 

@@ -10,6 +10,7 @@
 #include <ExecuteNode.h>
 #include <ModifyTargetNode.h>
 #include <MethodNode.h>
+#include <PlayerNode.h>
 
 #include <sstream>
 
@@ -24,12 +25,6 @@ std::string targetNames[] = {
         "everyone", "@e",
         "random", "@r",
         "self", "@s",
-};
-
-std::string methods[] = {
-        "say",
-        "teleport",
-        "weather",
 };
 
 std::string CodeNode::getSource() {
@@ -65,11 +60,13 @@ CodeNode::CodeNode(Node *parent, const std::string &source) : Node(parent, Code)
             node = new FunctionNode(this, parser, attr);
         } else if (next == "score") {
             node = new ScoreNode(this, parser);
+        } else if (next == "player") {
+            node = new PlayerNode(this, parser);
         } else if (next == "as") {
             node = new ExecuteNode(this, parser);
         } else if (next == "/") {
             node = new CommandNode(this, parser.nextSymbol() + parser.untilNextSymbols({'\n', ';', '/'}));
-        } else if (next == "#") {
+        } else if (next == "//") {
             parser.untilNextSymbol('\n');
         } else {
             ScoreNode *score = (ScoreNode *) parentSearch([next](Node *node) {
@@ -79,14 +76,12 @@ CodeNode::CodeNode(Node *parent, const std::string &source) : Node(parent, Code)
 
             bool generalTarget =
                     std::find(std::begin(targetNames), std::end(targetNames), next) != std::end(targetNames);
-            bool isMethods =
-                    std::find(std::begin(methods), std::end(methods), next) != std::end(methods);
 
             if (score) {
                 node = new ModifyScoreNode(this, parser);
             } else if (generalTarget) {
                 node = new ModifyTargetNode(this, parser);
-            } else if (isMethods) {
+            } else if (MethodNode::hasMethod(next)) {
                 node = new MethodNode(this, parser);
             } else if (next == ";") {
                 parser.nextSymbol();
