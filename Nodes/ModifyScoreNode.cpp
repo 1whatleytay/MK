@@ -30,7 +30,7 @@ ModifyScoreNode::ModifyScoreNode(Node *parent, Parser &parser) : Node(parent, Mo
     std::string target = parser.nextWord();
     modifyScore = (ScoreNode *)parentSearch([target](Node *node) {
         return node->type == Score && ((ScoreNode *)node)->scoreName == target;
-    });
+    }); // TODO: Do at build time.
 
     switch (parser.nextSymbol()) {
         case '.': {
@@ -65,4 +65,14 @@ ModifyScoreNode::ModifyScoreNode(Node *parent, Parser &parser) : Node(parent, Mo
     }
 
     params.finish();
+
+    if (parser.nextWord() == "where") {
+        if (parser.nextSymbol() != '(') throw UnexpectedSymbol({ '(' }, parser.lastSymbol());
+        parser.pushMode(Parser::Original);
+        modifyTarget += "[" + parser.untilNextSymbol(')') + "]";
+        parser.popMode();
+        if (parser.nextSymbol() != ')') throw UnexpectedSymbol({ ')' }, parser.lastSymbol());
+    } else {
+        parser.rollback();
+    }
 }

@@ -80,6 +80,17 @@ void DataPack::make() {
         }
     }
 
+    if (!recipes.empty()) {
+        std::string recipesPath = namespacePath + "recipes/";
+        makeDirectory(recipesPath);
+
+        for (const auto &pair : recipes) {
+            std::string fileName = pair.first + ".json";
+            textTo(recipesPath + fileName, pair.second);
+            pendingFiles << "data/" + name + "/recipes" + fileName + "\n";
+        }
+    }
+
     if (artifact)
         textTo(path + "mk.artifact", pendingFiles.str());
 }
@@ -94,6 +105,10 @@ void DataPack::addOnLoad(const std::string &functionName) {
 
 void DataPack::addFunction(const std::string &functionName, const std::string &source) {
     functions[functionName] = source;
+}
+
+void DataPack::addRecipe(const std::string &recipeName, const JSON *json) {
+    recipes[recipeName] = json->make();
 }
 
 void DataPack::setFormat(double value) {

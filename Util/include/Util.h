@@ -87,6 +87,14 @@ public:
     DuplicateDefinition(std::string name, std::string type);
 };
 
+class UnknownFunction : Exception {
+    std::string name;
+public:
+    std::string info() const override;
+
+    UnknownFunction(std::string name);
+};
+
 std::string textFrom(const std::string &path);
 std::vector<unsigned> dataFrom(const std::string &path);
 void textTo(const std::string &path, const std::string &text);

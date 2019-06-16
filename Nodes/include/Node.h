@@ -18,6 +18,7 @@ public:
         ModifyTarget,
         Method,
         Player,
+        Recipe,
     };
 
     Node *parent;

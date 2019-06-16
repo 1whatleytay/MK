@@ -1,5 +1,6 @@
 #include <Formats.h>
 
+#include <sstream>
 #include <unordered_map>
 
 std::unordered_map<std::string, std::string> targetAliases = {
@@ -601,4 +602,21 @@ std::string parseEntity(const std::string &entity) {
 std::string parseQuotes(const std::string &text) {
     // TODO: Fill in with cool stuff, e.g. escapes and take Parser object instead.
     return text.substr(1, text.size() - 2);
+}
+
+std::string parseName(const std::string &text) {
+    std::stringstream stream;
+    bool first = true;
+    for (char a : text) {
+        if (std::isupper(a)) {
+            if (!first) {
+                stream << "_";
+            }
+            stream << (char)std::tolower(a);
+        } else {
+            stream << a;
+        }
+        if (first) first = false;
+    }
+    return stream.str();
 }

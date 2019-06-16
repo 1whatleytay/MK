@@ -6,6 +6,7 @@
 #include <TagNode.h>
 #include <FunctionNode.h>
 #include <ScoreNode.h>
+#include <RecipeNode.h>
 
 #include <sstream>
 
@@ -45,6 +46,12 @@ void Builder::build() {
             if (function->onLoad) dataPack->addOnLoad(function->funcName);
             if (function->onTick) dataPack->addOnTick(function->funcName);
         }
+
+        if (node->type == Node::Recipe) {
+            RecipeNode *recipe = (RecipeNode *)node;
+            dataPack->addRecipe(recipe->recipeName, recipe->createJSON());
+        }
+
         return false;
     });
 

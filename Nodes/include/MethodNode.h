@@ -11,6 +11,7 @@ class MethodInfo;
 class MethodNode : public Node {
 public:
     const MethodInfo *method = nullptr;
+    std::string methodName;
     std::unordered_map<std::string, std::string> methodValues;
 
     std::string getSource() override;

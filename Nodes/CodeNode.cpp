@@ -11,12 +11,15 @@
 #include <ModifyTargetNode.h>
 #include <MethodNode.h>
 #include <PlayerNode.h>
+#include <RecipeNode.h>
 
 #include <sstream>
 
 std::string attributes[] = {
         "load",
-        "tick"
+        "tick",
+        "ordered",
+        "unordered",
 };
 
 std::string targetNames[] = {
@@ -67,7 +70,9 @@ CodeNode::CodeNode(Node *parent, const std::string &source) : Node(parent, Code)
         } else if (next == "/") {
             node = new CommandNode(this, parser.nextSymbol() + parser.untilNextSymbols({'\n', ';', '/'}));
         } else if (next == "//") {
-            parser.untilNextSymbol('\n');
+            parser.untilNextSymbol('\n'); parser.nextSymbol();
+        } else if (next == "recipe") {
+            node = new RecipeNode(this, parser);
         } else {
             ScoreNode *score = (ScoreNode *) parentSearch([next](Node *node) {
                 return node->type == Score && ((ScoreNode *) node)->scoreName == next;
@@ -86,7 +91,8 @@ CodeNode::CodeNode(Node *parent, const std::string &source) : Node(parent, Code)
             } else if (next == ";") {
                 parser.nextSymbol();
             } else {
-                throw UnexpectedLine(parser.untilNextSymbol('\n'));
+                node = new MethodNode(this, parser);
+//                throw UnexpectedLine(parser.untilNextSymbol('\n'));
             }
         }
 

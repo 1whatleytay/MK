@@ -10,6 +10,7 @@ add_library(mk-nodes
         include/ModifyTargetNode.h
         include/MethodNode.h
         include/PlayerNode.h
+        include/RecipeNode.h
 
         Node.cpp
         CodeNode.cpp
@@ -21,7 +22,8 @@ add_library(mk-nodes
         ExecuteNode.cpp
         ModifyTargetNode.cpp
         MethodNode.cpp
-        PlayerNode.cpp)
+        PlayerNode.cpp
+        RecipeNode.cpp)
 
 target_include_directories(mk-nodes PUBLIC include)
-target_link_libraries(mk-nodes mk-util)
+target_link_libraries(mk-nodes mk-util mk-resources)

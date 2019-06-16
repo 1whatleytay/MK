@@ -62,6 +62,10 @@ std::string DuplicateDefinition::info() const {
 DuplicateDefinition::DuplicateDefinition(std::string name, std::string type)
     : name(std::move(name)), type(std::move(type)) { }
 
+std::string UnknownFunction::info() const { return "Unknown function named \"" + name + "\"."; }
+
+UnknownFunction::UnknownFunction(std::string name) : name(name) { }
+
 std::string textFrom(const std::string &path) {
     std::ifstream stream = std::ifstream(path, std::ios::ate);
     if (!stream.good()) throw FileNotFound(path);

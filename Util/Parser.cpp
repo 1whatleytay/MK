@@ -119,7 +119,7 @@ char Parser::lastSymbol() {
 
     while (index > 0 && std::isspace(text[index])) { index--; }
 
-    if (index >= 0) return text[index--];
+    if (index >= 0) return text[--index];
     else {
         index = 0;
         return ' ';

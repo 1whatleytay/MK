@@ -1,34 +1,14 @@
 #include "MethodNode.h"
 
+#include "FunctionNode.h"
+
 #include <Parser.h>
 #include <Params.h>
 #include <Formats.h>
 
+#include <Methods.h>
+
 #include <sstream>
-
-// Bossbar should be its own object imo
-
-MethodInfo globalMethods[] = {
-        { "help", { { "command", Params::Text, { }, true } }, "help [command]" },
-        { "say", { { "text", Params::Text } }, "say [text]" },
-        { "weather", { { "weather", Params::Text, { "clear", "rain", "thunder" } } }, "weather [weather]" },
-        { "clone",
-          {
-            { "c1", Params::Coordinate }, { "c2", Params::Coordinate }, { "c3", Params::Coordinate },
-                  { "mask", Params::Text, { "filtered", "masked", "replace" }, true },
-                  { "clone", Params::Text, { "force", "move", "normal" }, true },
-                  { "block", Params::Item, { }, true }, { "data", Params::Text, { }, true }
-          },
-          "clone [c1] [c2] [c3] [mask] [clone] [block] [data]" },
-        { "difficulty",
-          { { "diff", Params::Text, { "peaceful", "easy", "normal", "hard", "p", "e", "n", "h" } } },
-          "difficulty [diff]" },
-        { "summon",
-          {
-            { "entity", Params::Entity },
-            { "coord", Params::Coordinate, { }, true }, { "data", Params::Text, { }, true } },
-            "summon [entity] [coord] [data]" }
-};
 
 static const MethodInfo *findGlobalMethod(const std::string &name) {
     for (const MethodInfo &method : globalMethods) {
@@ -42,6 +22,15 @@ bool MethodNode::hasMethod(const std::string &name) {
 }
 
 std::string MethodNode::getSource() {
+    if (!method) {
+        std::string actualName = parseName(methodName);
+        Node *select = parentSearch([&actualName](Node *node) {
+            return node->type == Type::Function && ((FunctionNode *)node)->funcName == actualName;
+        });
+        if (!select) throw UnknownFunction(methodName);
+        return "function " + parseName(methodName) + "\n";
+    }
+
     Parser parser = Parser(method->source);
     std::stringstream stream;
 
@@ -64,29 +53,43 @@ std::string MethodNode::getSource() {
 }
 
 MethodNode::MethodNode(Node *parent, Parser &parser) : Node(parent, Method) {
-    std::string name = parser.nextWord();
+    methodName = parser.nextWord();
+    if (parser.nextSymbol() != '(') {
+        parser.rollback();
+        throw Unexpected("word", parser.nextWord());
+    }
+    parser.rollback();
     Params params = Params(parser);
 
-    method = findGlobalMethod(name);
+    method = findGlobalMethod(methodName);
 
-    for (const MethodInfo::Param& param : method->params) {
-        std::string value = params.next(param.type, param.optional);
-        if (value.empty()) break;
-        if (!param.allowedValues.empty()) {
-            if (std::find(std::begin(param.allowedValues), std::end(param.allowedValues), value)
-                == std::end(param.allowedValues)) {
-                std::stringstream stream;
-                stream << "allowed value (";
-                for (int a = 0; a < param.allowedValues.size(); a++) {
-                    stream << param.allowedValues[a];
-                    if (a < param.allowedValues.size() - 1) stream << " or ";
+    if (method) {
+        for (const MethodInfo::Param &param : method->params) {
+            std::string value = params.next(param.type, param.optional);
+            if (value.empty()) break;
+            if (!param.allowedValues.empty()) {
+                if (std::find(std::begin(param.allowedValues), std::end(param.allowedValues), value)
+                    == std::end(param.allowedValues)) {
+                    std::stringstream stream;
+                    stream << "allowed value (";
+                    for (int a = 0; a < param.allowedValues.size(); a++) {
+                        stream << param.allowedValues[a];
+                        if (a < param.allowedValues.size() - 1) stream << " or ";
+                    }
+                    stream << ")";
+                    throw InvalidParam(stream.str(), value);
                 }
-                stream << ")";
-                throw InvalidParam(stream.str(), value);
             }
+            methodValues[param.name] = value;
         }
-        methodValues[param.name] = value;
+    } else {
+        log("[Callable Custom Function " + methodName + "]");
     }
 
     params.finish();
+
+    if (parser.nextWord() == "where") {
+        log("WARNING: Keyword \"where\" is not allowed with a global method. Use as instead.");
+    }
+    parser.rollback();
 }

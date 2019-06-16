@@ -18,7 +18,6 @@ class Parser {
 public:
     enum Mode {
         Generic,
-        Structure,
         Original,
     };
 

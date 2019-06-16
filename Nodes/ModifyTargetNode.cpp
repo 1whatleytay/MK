@@ -4,29 +4,9 @@
 #include <Params.h>
 #include <Formats.h>
 
-#include <sstream>
+#include <Methods.h>
 
-MethodInfo targetMethods[] = {
-        { "kill", { }, "kill [target]" },
-        { "give",
-            { { "item", Params::Item }, { "count", Params::Number },  { "data", Params::Text, { }, true } },
-            "give [target] [item][data] [count]" },
-        { "playSound",
-            {
-                { "sound", Params::Text },
-                { "source", Params::Text,
-                  { "master", "music", "record", "weather", "block", "hostile", "neutral", "player", "ambient", "voice" }
-                },
-                { "coord", Params::Coordinate, { }, true },
-                { "volume", Params::Text, { }, true },
-                { "pitch", Params::Text, { }, true },
-                { "minVolume", Params::Text, { }, true },
-            },
-          "playsound [sound] [source] [target] [coord] [volume] [pitch] [minVolume]" },
-        { "gamemode",
-            { { "mode", Params::Text, { "survival", "creative", "adventure", "spectator" } } },
-            "gamemode [mode] [target]" }
-};
+#include <sstream>
 
 static const MethodInfo *findTargetMethod(const std::string &name) {
     for (const MethodInfo &method : targetMethods) {
@@ -47,6 +27,7 @@ std::string ModifyTargetNode::getSource() {
 
     while (!parser.reachedEnd()) {
         stream << parser.untilNextSymbol('[');
+        if (parser.reachedEnd()) break;
         if (parser.nextSymbol() != '[') throw Unexpected(method->source, "Target Method Source");
         std::string inBetween = parser.untilNextSymbol(']');
         if (parser.nextSymbol() != ']') throw Unexpected(method->source, "Target Method Source");
@@ -63,30 +44,45 @@ std::string ModifyTargetNode::getSource() {
 
 ModifyTargetNode::ModifyTargetNode(Node *parent, Parser &parser) : Node(parent, ModifyTarget) {
     methodValues["target"] = parseTarget(parser.nextWord());
-    if (parser.nextSymbol() != '.') throw UnexpectedSymbol({ '.' }, parser.lastSymbol());
+    if (parser.nextSymbol() != '.') throw UnexpectedSymbol({'.'}, parser.lastSymbol());
     std::string name = parser.nextWord();
     Params params = Params(parser);
 
     method = findTargetMethod(name);
 
-    for (const MethodInfo::Param& param : method->params) {
-        std::string value = params.next(param.type, param.optional);
-        if (value.empty()) break;
-        if (!param.allowedValues.empty()) {
-            if (std::find(std::begin(param.allowedValues), std::end(param.allowedValues), value)
-                == std::end(param.allowedValues)) {
-                std::stringstream stream;
-                stream << "allowed value (";
-                for (int a = 0; a < param.allowedValues.size(); a++) {
-                    stream << param.allowedValues[a];
-                    if (a < param.allowedValues.size() - 1) stream << " or ";
+    if (method) {
+        for (const MethodInfo::Param &param : method->params) {
+            std::string value = params.next(param.type, param.optional);
+            if (value.empty()) break;
+            if (!param.allowedValues.empty()) {
+                if (std::find(std::begin(param.allowedValues), std::end(param.allowedValues), value)
+                    == std::end(param.allowedValues)) {
+                    std::stringstream stream;
+                    stream << "allowed value (";
+                    for (int a = 0; a < param.allowedValues.size(); a++) {
+                        stream << param.allowedValues[a];
+                        if (a < param.allowedValues.size() - 1) stream << " or ";
+                    }
+                    stream << ")";
+                    throw InvalidParam(stream.str(), value);
                 }
-                stream << ")";
-                throw InvalidParam(stream.str(), value);
             }
+            methodValues[param.name] = value;
         }
-        methodValues[param.name] = value;
+    } else {
+        throw UnknownFunction(name);
     }
 
     params.finish();
+
+    if (parser.nextWord() != "where") {
+        parser.rollback();
+        return;
+    }
+
+    if (parser.nextSymbol() != '(') throw UnexpectedSymbol({'('}, parser.lastSymbol());
+    parser.pushMode(Parser::Original);
+    methodValues["target"] += "[" + parser.untilNextSymbol(')') + "]"; // TODO: Actually parse contents.
+    parser.popMode();
+    if (parser.nextSymbol() != ')') throw UnexpectedSymbol({')'}, parser.lastSymbol());
 }

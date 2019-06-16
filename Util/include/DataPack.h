@@ -5,6 +5,8 @@
 
 #include <unordered_map>
 
+class JSON;
+
 class DataPack {
     std::string name;
     std::string description;
@@ -18,12 +20,14 @@ class DataPack {
     std::vector<std::string> onTick;
 
     std::unordered_map<std::string, std::string> functions;
+    std::unordered_map<std::string, std::string> recipes;
 public:
     void make();
 
     void addOnTick(const std::string &functionName);
     void addOnLoad(const std::string &functionName);
     void addFunction(const std::string &functionName, const std::string &source);
+    void addRecipe(const std::string &recipeName, const JSON *json);
 
     void setFormat(double value);
     void setDescription(const std::string &desc);

@@ -2,6 +2,8 @@
 
 #include "Builder.h"
 
+#define NO_CATCH
+
 int main(int count, char **args) {
     if (count <= 1) {
         logInfo("Usage: mk path/to/main");

@@ -1,4 +1,5 @@
 # MK - A minecraft datapack tool.
+This project aims to create a function-based programming language for Minecraft DataPacks.
 
 ## Building
 MK depends on CMake to build. Be sure to download it [here](https://cmake.org/).
@@ -6,7 +7,7 @@ Clone the repository with `git clone https://github.com/1whatleytay/MK.git`.
 
 - Open the directory with `cd MK`.
 - Creating the project depends on your OS:
-  - On Windows, you can generate a Visual Studio project with `cmake -G "Visual Studio 12 2013 Win64" .`.
+  - On Windows, you can generate a Visual Studio project with `cmake -G "Visual Studio 15 2017 Win64" .`.
   - On macOS, you can generate an XCode project with `cmake -G XCode .`.
   - On a platform with make, CMake will usually default to it. Just try `cmake .`.
 - You can now build MK with the project that was generated (something like  `make`).
@@ -30,7 +31,7 @@ Tag Name | Tag Value | Default
 name | The DataPack name. | MK
 description | The DataPack description. | 
 format | The DataPack format. | 1
-init | The name of the internal init funtion. | __init
+init | The name of the internal init function. | __init
 
 ### Functions
 These are DataPack functions, not exactly the programming type.

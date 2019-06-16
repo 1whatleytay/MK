@@ -10,4 +10,6 @@ std::string parseEntity(const std::string &target);
 
 std::string parseQuotes(const std::string &text);
 
+std::string parseName(const std::string &name);
+
 #endif //MK_CHECKER_H

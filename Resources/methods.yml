@@ -1,0 +1,159 @@
+globalMethods:
+  - help:
+      params:
+        - command:
+            type: Text
+            optional: true
+      source: "help [command]"
+  - say:
+      params:
+        - text:
+            type: Text
+      source: "say [text]"
+  - weather:
+      params:
+        - weather:
+            type: Text
+            values:
+              - clear
+              - rain
+              - thunder
+      source: "weather [weather]"
+  - clone:
+      params:
+        - c1:
+            type: Coordinate
+        - c2:
+            type: Coordinate
+        - c3:
+            type: Coordinate
+        - mask:
+            type: Text
+            values:
+              - filtered
+              - masked
+              - replace
+            optional: true
+        - mode:
+            type: Text
+            values:
+              - force
+              - move
+              - normal
+            optional: true
+        - block:
+            type: Item
+            optional: true
+      source: "clone [c1] [c2] [c3] [mask] [mode] [block]"
+  - difficulty:
+      params:
+        - level:
+            type: Text
+            values:
+              - peaceful
+              - easy
+              - normal
+              - hard
+              - p
+              - e
+              - n
+              - h
+      source: "difficulty [level]"
+  - summon:
+      params:
+        - entity:
+            type: Entity
+        - coord:
+            type: Coordinate
+            optional: true
+        - data:
+            type: Text
+            optional: true
+      source: "summon [entity] [coord] [data]"
+  - setTime:
+      params:
+        - value:
+            type: Text
+      source: "time set [value]"
+  - addTime:
+      params:
+        - value:
+            type: Text
+      source: "time add [value]"
+  - queryTime:
+      params:
+        - type:
+            type: Text
+            values:
+              - daytime
+              - gametime
+              - day
+      source: "time query [type]"
+
+targetMethods:
+  - kill:
+      params: []
+      source: "kill [target]"
+  - give:
+      params:
+        - item:
+            type: Item
+        - count:
+            type: Number
+        - data:
+            type: Text
+            optional: true
+      source: "give [target] [item][data] [count]"
+  - playSound:
+      params:
+        - sound:
+            type: Text
+        - source:
+            type: Text
+            values:
+              - master
+              - music
+              - record
+              - weather
+              - block
+              - hostile
+              - neutral
+              - player
+              - ambient
+              - voice
+        - coord:
+            type: Coordinate
+            optional: true
+        - volume:
+            type: Text
+            optional: true
+        - pitch:
+            type: Text
+            optional: true
+        - minVolume:
+            type: Text
+            optional: true
+      source: "playsound [sound] [source] [target] [coord] [volume] [pitch] [minVolume]"
+  - gamemode:
+      params:
+        - mode:
+            type: Text
+            values:
+              - survival
+              - creative
+              - adventure
+              - spectator
+      source: "gamemode [mode] [target]"
+  - addTag:
+      params:
+        - name:
+            type: Text
+      source: "tag [target] add [name]"
+  - removeTag:
+      params:
+        - name:
+            type: Text
+      source: "tag [target] remove [name]"
+  - listTags:
+      params: []
+      source: "tag [target] list"
