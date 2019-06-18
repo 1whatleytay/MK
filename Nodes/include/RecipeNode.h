@@ -8,14 +8,19 @@
 class JSON;
 class Parser;
 
+enum class RecipeType {
+    Shaped,
+    Shapeless,
+};
+
 class RecipeNode : public Node {
     void defineParams();
 
     std::unordered_map<std::string, std::string> parameters;
     std::vector<std::string> contents;
 
-
 public:
+    RecipeType recipeType;
     std::string recipeName;
 
     JSON *createJSON();

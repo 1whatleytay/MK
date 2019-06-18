@@ -8,6 +8,8 @@
 #include <ScoreNode.h>
 #include <RecipeNode.h>
 
+#include <JSON.h>
+
 #include <sstream>
 
 TagNode* Builder::getTag(const std::string& tagName) {
@@ -49,7 +51,9 @@ void Builder::build() {
 
         if (node->type == Node::Recipe) {
             RecipeNode *recipe = (RecipeNode *)node;
-            dataPack->addRecipe(recipe->recipeName, recipe->createJSON());
+            JSON *json = recipe->createJSON();
+            dataPack->addRecipe(recipe->recipeName, json);
+            delete json;
         }
 
         return false;

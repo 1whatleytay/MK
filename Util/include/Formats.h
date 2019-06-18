@@ -3,6 +3,8 @@
 
 #include <Util.h>
 
+bool isItemOrBlock(const std::string &target);
+
 std::string parseTarget(const std::string &target);
 std::string parseMinecraft(const std::string &target);
 std::string parseItemOrBlock(const std::string &target);

@@ -83,11 +83,13 @@ void DataPack::make() {
     if (!recipes.empty()) {
         std::string recipesPath = namespacePath + "recipes/";
         makeDirectory(recipesPath);
+        std::string craftingPath = recipesPath + "crafting/";
+        makeDirectory(craftingPath);
 
         for (const auto &pair : recipes) {
             std::string fileName = pair.first + ".json";
-            textTo(recipesPath + fileName, pair.second);
-            pendingFiles << "data/" + name + "/recipes" + fileName + "\n";
+            textTo(craftingPath + fileName, pair.second);
+            pendingFiles << "data/" + name + "/recipes/crafting/" + fileName + "\n";
         }
     }
 

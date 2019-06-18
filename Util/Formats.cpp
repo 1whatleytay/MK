@@ -571,6 +571,11 @@ const std::string validEntities[] = {
 
 const std::string minecraft = "minecraft:";
 
+bool isItemOrBlock(const std::string &target) {
+    return std::find(std::begin(validItemsOrBlocks), std::end(validItemsOrBlocks), parseMinecraft(target))
+        != std::end(validItemsOrBlocks);
+}
+
 std::string parseTarget(const std::string &target) {
     if (targetAliases.find(target) != targetAliases.end()) return targetAliases[target];
     return target;
@@ -593,7 +598,7 @@ std::string parseItemOrBlock(const std::string &item) {
 std::string parseEntity(const std::string &entity) {
     std::string result = parseMinecraft(entity);
     if (std::find(std::begin(validEntities), std::end(validEntities), result)
-        == std::end(validItemsOrBlocks)) {
+        == std::end(validEntities)) {
         throw InvalidParam("entity", entity);
     }
     return result;
